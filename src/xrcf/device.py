@@ -4,7 +4,7 @@ import errno
 import logging
 
 import numpy as np
-import mcareader as mca
+import xrcf.mcareader as mca
 
 logger = logging.getLogger('xrcf')
 
