@@ -1,0 +1,2 @@
+# Transmission of a 400 LPI Ni mesh.
+0.60
