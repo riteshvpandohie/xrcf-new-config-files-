@@ -29,6 +29,17 @@ from xrcf.device import SDD, GPC
 from xrcf.utilities import electronvolts
 
 #//////////////////////////////////////////////////////////////////////////////
+# logging
+#//////////////////////////////////////////////////////////////////////////////
+xrcf.logger.setLevel(logging.DEBUG)
+
+# test
+# xrcf.logger.debug('This is a debug message')
+# xrcf.logger.warning('This is a warning message')
+# xrcf.logger.error('This is an error message')
+# xrcf.logger.info('This is an info message')
+
+#//////////////////////////////////////////////////////////////////////////////
 # parse arguments
 #//////////////////////////////////////////////////////////////////////////////
 
@@ -84,17 +95,6 @@ def power2(x):
 if gpc_merge_bins > 1:
     if not power2(gpc_merge_bins):
         raise ValueError('Not a power of two:', gpc_merge_bins)
-
-#//////////////////////////////////////////////////////////////////////////////
-# logging
-#//////////////////////////////////////////////////////////////////////////////
-xrcf.logger.setLevel(logging.DEBUG)
-
-# test
-# xrcf.logger.debug('This is a debug message')
-# xrcf.logger.warning('This is a warning message')
-# xrcf.logger.error('This is an error message')
-# xrcf.logger.info('This is an info message')
 
 #//////////////////////////////////////////////////////////////////////////////
 # fetch data from files
