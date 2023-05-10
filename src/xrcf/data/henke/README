@@ -1,1 +1,10 @@
- The temperature is set to 295 K
+The tabular values here were obtained from the Center for X-Ray Optics x-ray interactions with matter calculator [1]
+
+The temperature of the P-10 gas is set to 295 K
+
+VYNS formula:  C22H33O2Cl9
+VYNS window area density:  27 µg/cm²
+VYNS window thickness:  0.179 µm
+VYNS window density:  1.508 g/cm³
+
+[1] https://henke.lbl.gov/

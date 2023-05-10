@@ -26,7 +26,8 @@ sys.modules[spec.name] = xrcf
 spec.loader.exec_module(xrcf)
 
 from xrcf.device import SDD, GPC
-from xrcf.utilities import electronvolts, transmission_gas_function
+from xrcf.utilities import electronvolts, transmission_vyns_function, \
+    transmission_gas_function
 
 #//////////////////////////////////////////////////////////////////////////////
 # logging
@@ -77,16 +78,18 @@ pressure_gpc        = config.getfloat('GPC', 'pressure')
 distance_gpc        = config.getfloat('GPC', 'distance')
 diameter_gpc        = config.getfloat('GPC', 'diameter')
 transmission_mesh   = config.getfloat('GPC', 'transmission_mesh')
-transmission_window = config.getfloat('GPC', 'transmission_window')
+
+transmission_window = None
+try:
+    transmission_window = config.getfloat('GPC', 'transmission_window')
+except:
+    transmission_window = None
+
 transmission_gas    = None
 try:
     transmission_gas = config.getfloat('GPC', 'transmission_gas')
 except:
     transmission_gas = None
-    xrcf.logger.info(
-        'Transmission of gas not set. '
-        'Transmission of {} gas will be determined using a pressure of {} Torr and a temperature of 295 K.'
-        .format(gas_gpc, pressure_gpc))
 
 start_gpc           = config.getint('GPC', 'start')
 stop_gpc            = config.getint('GPC', 'stop')
@@ -118,11 +121,23 @@ gpc = GPC(gpc_file_path)
 # gas proportional counter
 #-----------------------------------------------------------------------
 
-transmission_gas_ = transmission_gas_function(gas_gpc, pressure_gpc)
+if not transmission_gas:
+    transmission_gas_ = transmission_gas_function(gas_gpc, pressure_gpc)
+    transmission_gas = transmission_gas_(energy)
+    xrcf.logger.info(
+        'Transmission of gas is not set in the configuration file. '
+        'A transmission value of {} will be used for the {} gas assuming a pressure of {} Torr and a temperature of 295 K.'
+        .format(transmission_gas, gas_gpc, pressure_gpc))
 
-absorption_gas = 1 - transmission_gas_(energy)
-if transmission_gas:
-    absorption_gas = 1 - transmission_gas
+if not transmission_window:
+    transmission_window_ = transmission_vyns_function()
+    transmission_window = transmission_window_(energy)
+    xrcf.logger.info(
+        'Transmission of window is not set in the configuration file. '
+        'A transmission value of {} will be used for the window.'
+        .format(transmission_window))
+
+absorption_gas = 1 - transmission_gas
 qe_gpc = transmission_mesh * transmission_window * absorption_gas
 
 counts_gpc = np.sum(gpc.counts[start_gpc:stop_gpc])
