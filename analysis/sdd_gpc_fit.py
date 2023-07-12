@@ -197,7 +197,7 @@ ax_sdd.text(0.9825, 0.95, textstr, transform=ax_sdd.transAxes, fontsize=14,
 
 textstr = '\n'.join((
     r'$\mu=%.6f\pm%.6f$ keV' % (electronvolts(mu, sdd_α, sdd_β)/1e3, mu_err/sdd_β/1e3, ),
-    r'$\sigma=%.6f\pm%.6f$ keV' % (electronvolts(sigma, sdd_α, sdd_β)/1e3, sigma_err/sdd_β/1e3, )))
+    r'$\sigma=%.6f\pm%.6f$ keV' % (sigma/sdd_β/1e3, sigma_err/sdd_β/1e3, )))
 
 # place a text box in upper left in axes coords
 ax_sdd.text(0.9825, 0.525, textstr, transform=ax_sdd.transAxes, fontsize=14,
