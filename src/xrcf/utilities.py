@@ -9,6 +9,7 @@ logger = logging.getLogger('xrcf')
 amptek_dir = '../src/xrcf/data/amptek/'
 henke_dir = '../src/xrcf/data/henke/'
 sri_dir = '../src/xrcf/data/sri/'
+silicon_dir = '../src/xrcf/data/silicon/'
 gasses = [ 'p10' ]
 pressures = [ 400, 600, 800 ]
 
@@ -50,7 +51,7 @@ def sdd_c1_c2_efficiency_function(window='c1', efficiency='pe'):
 
     data = np.loadtxt(file_path, skiprows=12, dtype=float)
 
-    x = data[:, 0] * 1e3
+    x = data[:, 0] * 1e3  # convert from keV to eV
     y = data[:, 2]
 
     if window == 'c1' and efficiency == 'total':
@@ -78,7 +79,25 @@ def sri_cmos_efficiency_function():
 
     data = np.loadtxt(file_path, skiprows=0, dtype=float)
 
-    x = data[:, 0]
+    x = data[:, 0]  # eV
+    y = data[:, 1]
+
+    return interp1d(x, y)
+
+#//////////////////////////////////////////////////////////////////////////////
+# transmission of 500-micron-thick silicon
+#//////////////////////////////////////////////////////////////////////////////
+
+def transmission_silicon_function():
+
+    # check if Henke data file exists
+    file_path = henke_dir + 'silicon-500-microns.txt'
+    if not os.path.isfile(file_path):
+        raise IOError(errno.ENOENT, 'No such file or directory', file_path)
+
+    data = np.loadtxt(file_path, skiprows=2, dtype=float)
+
+    x = data[:, 0]  # eV
     y = data[:, 1]
 
     return interp1d(x, y)
@@ -96,7 +115,7 @@ def transmission_vyns_function():
 
     data = np.loadtxt(file_path, skiprows=2, dtype=float)
 
-    x = data[:, 0]
+    x = data[:, 0]  # eV
     y = data[:, 1]
 
     return interp1d(x, y)
@@ -123,8 +142,26 @@ def transmission_gas_function(gas, pressure):
 
     data = np.loadtxt(file_path, skiprows=2, dtype=float)
 
-    x = data[:, 0]
+    x = data[:, 0]  # eV
     y = data[:, 1]
+
+    return interp1d(x, y)
+
+#//////////////////////////////////////////////////////////////////////////////
+# silicon escape probabilities
+#//////////////////////////////////////////////////////////////////////////////
+
+def silicon_escape_probability_function():
+
+    # check if data file exists
+    file_path = silicon_dir + 'Silicon_k_L_Escape_Probabilities.csv'
+    if not os.path.isfile(file_path):
+        raise IOError(errno.ENOENT, 'No such file or directory', file_path)
+
+    data = np.loadtxt(file_path, skiprows=1, delimiter=',', dtype=float)
+
+    x = data[:, 0] * 1e3  # convert from keV to eV
+    y = data[:, 1] + data[:, 2] + data[:, 3]
 
     return interp1d(x, y)
 

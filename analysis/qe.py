@@ -27,7 +27,8 @@ spec.loader.exec_module(xrcf)
 
 from xrcf.device import SDD, GPC
 from xrcf.utilities import electronvolts, transmission_vyns_function, \
-    transmission_gas_function
+    transmission_gas_function, transmission_silicon_function, \
+    silicon_escape_probability_function
 
 #//////////////////////////////////////////////////////////////////////////////
 # logging
@@ -156,21 +157,36 @@ xrcf.logger.info('Estimated quantum efficiency of gas proportional counter: {}'.
 # detector
 #-----------------------------------------------------------------------
 
+transmission_silicon_ = transmission_silicon_function()
+absorption_silicon = 1 - transmission_silicon_(energy)
+silicon_escape_probability_ = silicon_escape_probability_function()
+silicon_escape_probability = silicon_escape_probability_(energy)
+p = silicon_escape_probability * absorption_silicon
+
 counts_det = np.sum(sdd.counts[start_sdd:stop_sdd]).astype(int)
 time_det = sdd.live_time
 area_det = area_sdd
 distance_det = distance_sdd
+counts_silicon = counts_det / (1-p)
 
 rate_det = counts_det / time_det
+rate_silicon = counts_silicon / time_det
 solid_angle_det = area_det / distance_det / distance_det
 
 # estimated quantum efficiency of detector
 qe_det = rate_det / solid_angle_det / rate_gpc * solid_angle_gpc * qe_gpc
+qe_silicon = rate_silicon / solid_angle_det / rate_gpc * solid_angle_gpc * qe_gpc
 
+xrcf.logger.info('Absorption of 500-micron-thick silicon: {}'.format(absorption_silicon))
+xrcf.logger.info('Silicon escape probability: {}'.format(silicon_escape_probability))
+xrcf.logger.info('p: {}'.format(p))
 xrcf.logger.info('Counts from detector: {}'.format(counts_det))
+xrcf.logger.info('Estimated counts from silicon: {}'.format(counts_silicon))
 xrcf.logger.info('Live time of detector [s]: {}'.format(time_det))
 xrcf.logger.info('Estimated count rate of detector [counts/s]: {}'.format(rate_det))
+xrcf.logger.info('Estimated count rate of silicon [counts/s]: {}'.format(rate_silicon))
 xrcf.logger.info('Estimated quantum efficiency of detector: {}'.format(qe_det))
+xrcf.logger.info('Estimated quantum efficiency of silicon: {}'.format(qe_silicon))
 
 #//////////////////////////////////////////////////////////////////////////////
 # plot data
